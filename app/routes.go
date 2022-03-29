@@ -14,4 +14,9 @@ func (app *App) setRouters() {
 	app.Post("/creator", app.handleRequest(CreateCreator))
 	app.Get("/creator/{id}", app.handleRequest(GetCreator))
 	app.Get("/creator", app.handleRequest(GetCreators))
+
+	// routes for the brand.
+	app.Post("/brand", app.handleRequest(CreateBrand))
+	app.Get("/brand/{id}", app.handleRequest(GetBrand))
+	app.Get("/brand", app.handleRequest(GetBrands))
 }
