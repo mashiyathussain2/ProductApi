@@ -19,4 +19,9 @@ func (app *App) setRouters() {
 	app.Post("/brand", app.handleRequest(CreateBrand))
 	app.Get("/brand/{id}", app.handleRequest(GetBrand))
 	app.Get("/brand", app.handleRequest(GetBrands))
+
+	// routes for the brandcategory.
+	app.Post("/brandcategory", app.handleRequest(CreateBrandCategory))
+	app.Get("/brandcategory/{id}", app.handleRequest(GetBrandcategory))
+	app.Get("/brandcategory", app.handleRequest(GetBrandCategories))
 }
