@@ -61,7 +61,7 @@ func GetProducts(db *mongo.Database, res http.ResponseWriter, req *http.Request)
 		},
 	}
 	// query for find the user in the database
-	curser, err := db.Collection("product").Find(nil, bson.M{}, &findOptions)
+	curser, err := db.Collection("product").Find(context.Background(), bson.M{}, &findOptions)
 	if err != nil {
 		log.Printf("Error while quering collection: %v\n", err)
 		handler.ResponseWriter(res, http.StatusInternalServerError, "Error happend while reading data", nil)
