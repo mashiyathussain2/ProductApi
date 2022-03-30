@@ -24,4 +24,19 @@ func (app *App) setRouters() {
 	app.Post("/brandcategory", app.handleRequest(CreateBrandCategory))
 	app.Get("/brandcategory/{id}", app.handleRequest(GetBrandcategory))
 	app.Get("/brandcategory", app.handleRequest(GetBrandCategories))
+
+	// routes for the campaigndetails.
+	app.Post("/campaigndetails", app.handleRequest(CreateCampaignDetail))
+	app.Get("/campaigndetails/{id}", app.handleRequest(GetCampaignDetail))
+	app.Get("/campaigndetails", app.handleRequest(GetCampaignDetails))
+
+	// routes for the pebbles.
+	app.Post("/pebbles", app.handleRequest(CreatePebbles))
+	app.Get("/pebbles/{id}", app.handleRequest(GetPebble))
+	app.Get("/pebbles", app.handleRequest(GetPebbles))
+
+	// routes for the dashboard.
+	app.Post("/dashboard", app.handleRequest(CreateDashboard))
+	app.Get("/dashboard/{id}", app.handleRequest(GetDashboard))
+	app.Get("/dashboard", app.handleRequest(GetDashboards))
 }

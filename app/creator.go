@@ -81,7 +81,7 @@ func GetCreator(db *mongo.Database, res http.ResponseWriter, req *http.Request) 
 	}
 	var creator schema.Creator
 	// query for finding one user in the database.
-	err = db.Collection("product").FindOne(context.Background(), model.Creator{ID: id}).Decode(&creator)
+	err = db.Collection("creator").FindOne(context.Background(), model.Creator{ID: id}).Decode(&creator)
 	if err != nil {
 		switch err {
 		case mongo.ErrNoDocuments:
