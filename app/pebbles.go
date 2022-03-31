@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -41,21 +42,89 @@ func CreatePebbles(db *mongo.Database, res http.ResponseWriter, req *http.Reques
 
 // GetPebbles will handle pebbles list get request
 func GetPebbles(db *mongo.Database, res http.ResponseWriter, req *http.Request) {
-	var pebblesList []schema.Pebbles
+	//var pebblesList []schema.Pebbles
 
-	curser, err := db.Collection("pebbles").Find(context.Background(), bson.M{})
-	if err != nil {
-		log.Printf("Error while quering collection: %v\n", err)
-		handler.ResponseWriter(res, http.StatusInternalServerError, "Error happend while reading data", nil)
-		return
+	lookupStage := bson.D{
+		{
+			Key: "$lookup",
+			Value: bson.M{
+				"from":         "creator",
+				"localField":   "creator_id",
+				"foreignField": "_id",
+				"as":           "creator_details",
+			},
+		},
 	}
-	err = curser.All(context.Background(), &pebblesList)
-	if err != nil {
-		log.Fatalf("Error in curser: %v", err)
-		handler.ResponseWriter(res, http.StatusInternalServerError, "Error happend while reading data", nil)
-		return
+	lookupStage2 := bson.D{
+		{
+			Key: "$lookup",
+			Value: bson.M{
+				"from":         "product",
+				"localField":   "product_id",
+				"foreignField": "_id",
+				"as":           "product_details",
+			},
+		},
 	}
+	projectStage := bson.D{
+		{
+			Key: "$project",
+			Value: bson.M{
+				"creator_id": 0,
+				"product_id": 0,
+			},
+		},
+	}
+
+	unwindStage := bson.D{
+		{
+			Key: "$unwind",
+			Value: bson.M{
+				"path":                       "$creator_details",
+				"preserveNullAndEmptyArrays": true,
+			},
+		},
+	}
+
+	unwindStage2 := bson.D{
+		{
+			Key: "$unwind",
+			Value: bson.M{
+				"path":                       "$product_details",
+				"preserveNullAndEmptyArrays": true,
+			},
+		},
+	}
+
+	pipeline := mongo.Pipeline{lookupStage, lookupStage2, projectStage, unwindStage, unwindStage2}
+
+	showLoadedCursor, err := db.Collection("pebbles").Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		fmt.Println("Hello", err)
+
+	}
+	var pebblesList = []bson.M{}
+
+	if err = showLoadedCursor.All(context.TODO(), &pebblesList); err != nil {
+		fmt.Println("Hellooo")
+
+	}
+
 	handler.ResponseWriter(res, http.StatusOK, "", pebblesList)
+
+	// curser, err := db.Collection("pebbles").Find(context.Background(), bson.M{})
+	// if err != nil {
+	// 	log.Printf("Error while quering collection: %v\n", err)
+	// 	handler.ResponseWriter(res, http.StatusInternalServerError, "Error happend while reading data", nil)
+	// 	return
+	// }
+	// err = curser.All(context.Background(), &pebblesList)
+	// if err != nil {
+	// 	log.Fatalf("Error in curser: %v", err)
+	// 	handler.ResponseWriter(res, http.StatusInternalServerError, "Error happend while reading data", nil)
+	// 	return
+	// }
+	// handler.ResponseWriter(res, http.StatusOK, "", pebblesList)
 }
 
 func GetPebble(db *mongo.Database, res http.ResponseWriter, req *http.Request) {
