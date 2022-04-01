@@ -9,6 +9,7 @@ func JSONContentTypeMiddleware(next http.Handler) http.Handler {
 		//w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Credentials", "true")
+		w.Header().Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
 		next.ServeHTTP(w, r)
 	})
