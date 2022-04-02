@@ -21,9 +21,14 @@ func CreateCreator(db *mongo.Database, res http.ResponseWriter, req *http.Reques
 
 	creator := new(model.Creator)
 	err := json.NewDecoder(req.Body).Decode(creator)
+	if err != nil {
+		handler.ResponseWriter(res, http.StatusBadRequest, "body json request have issues!!!", nil)
+		return
+	}
 
 	// First find the user with their email in database if the user already created then return already exists.
-	err = db.Collection("creator").FindOne(context.Background(), model.Creator{Email: creator.Email, PhoneNumber: creator.PhoneNumber}).Decode(&creator)
+	err = db.Collection("creator").FindOne(context.Background(), model.Creator{Email: creator.Email}).Decode(&creator)
+	err = db.Collection("creator").FindOne(context.Background(), model.Creator{PhoneNumber: creator.PhoneNumber}).Decode(&creator)
 	// if user not exists in the database then create a new user and insert that user in the database.
 	result, err := db.Collection("creator").InsertOne(context.TODO(), creator)
 	if err != nil {
@@ -67,7 +72,7 @@ func GetCreator(db *mongo.Database, res http.ResponseWriter, req *http.Request) 
 		handler.ResponseWriter(res, http.StatusBadRequest, "id that you sent is wrong!!!", nil)
 		return
 	}
-	var creator schema.Creator
+	var creator bson.M
 	// query for finding one user in the database.
 	err = db.Collection("creator").FindOne(context.Background(), model.Creator{ID: id}).Decode(&creator)
 	if err != nil {
