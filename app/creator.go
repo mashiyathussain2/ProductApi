@@ -23,13 +23,13 @@ func CreateCreator(db *mongo.Database, res http.ResponseWriter, req *http.Reques
 	err := json.NewDecoder(req.Body).Decode(creator)
 
 	// First find the user with their email in database if the user already created then return already exists.
-	//err = db.Collection("product").FindOne(context.Background(), model.Product{BrandName: product.BrandName}).Decode(&product)
+	err = db.Collection("creator").FindOne(context.Background(), model.Creator{Email: creator.Email, PhoneNumber: creator.PhoneNumber}).Decode(&creator)
 	// if user not exists in the database then create a new user and insert that user in the database.
 	result, err := db.Collection("creator").InsertOne(context.TODO(), creator)
 	if err != nil {
 		switch err.(type) {
 		case mongo.WriteException:
-			handler.ResponseWriter(res, http.StatusNotAcceptable, "Email already exists in database.", nil)
+			handler.ResponseWriter(res, http.StatusNotAcceptable, "Email or phone number already exists in database.", nil)
 		default:
 			handler.ResponseWriter(res, http.StatusInternalServerError, "Error while inserting data.", nil)
 		}
@@ -42,19 +42,7 @@ func CreateCreator(db *mongo.Database, res http.ResponseWriter, req *http.Reques
 // GetCreators will handle creator list get request
 func GetCreators(db *mongo.Database, res http.ResponseWriter, req *http.Request) {
 	var creatorList []schema.Creator
-	// pageString := req.FormValue("page")
-	// page, err := strconv.ParseInt(pageString, 10, 64)
-	// if err != nil {
-	// 	page = 0
-	// }
-	// page = page * limit
-	// findOptions := options.FindOptions{
-	// 	Skip:  &page,
-	// 	Limit: &limit,
-	// 	Sort: bson.M{
-	// 		"_id": -1, // -1 for descending and 1 for ascending
-	// 	},
-	// }
+
 	// query for find the user in the database
 	curser, err := db.Collection("creator").Find(context.Background(), bson.M{})
 	if err != nil {
